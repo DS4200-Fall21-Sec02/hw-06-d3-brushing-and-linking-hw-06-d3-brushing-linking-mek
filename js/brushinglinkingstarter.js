@@ -13,7 +13,23 @@ var svg1 = d3
 
 //TODO: append svg object to the body of the page to house Scatterplot 2
 
+var svg2 = d3
+  .select("#dataviz_brushScatter")
+  .append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 //TODO: append svg object to the body of the page to house Bar chart 
+
+var svg3 = d3
+  .select("#dataviz_brushScatter")
+  .append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 // Define color scale
 var color = d3
@@ -93,6 +109,132 @@ d3.csv("data/iris.csv").then((data) => {
   }
 
   //TODO: Scatterplot 2 (show Sepal width on x-axis and Petal width on y-axis)
+{
+    var xKey2 = "Sepal_Width";
+    var yKey2 = "Petal_Width";
+
+    //Add X axis
+    var x2 = d3
+      .scaleLinear()
+      .domain(d3.extent(data.map((val) => val[xKey2])))
+      .range([0, width]);
+    svg2
+      .append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x2))
+      .call((g) =>
+        g
+          .append("text")
+          .attr("x", width)
+          .attr("y", margin.bottom - 4)
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "end")
+          .text(xKey2)
+      );
+
+    //Add Y axis
+    var y2 = d3
+      .scaleLinear()
+      .domain(d3.extent(data.map((val) => val[yKey2])))
+      .range([height, 0]);
+    svg2
+      .append("g")
+      .call(d3.axisLeft(y2))
+      .call((g) =>
+        g
+          .append("text")
+          .attr("x", -margin.left)
+          .attr("y", 10)
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "start")
+          .text(yKey2)
+      );
+
+    // Add dots
+    var myCircle2 = svg2
+      .append("g")
+      .selectAll("circle")
+      .data(data)
+      .enter()
+      .append("circle")
+      .attr("id", (d) => d.id)
+      .attr("cx", function (d) {
+        return x2(d[xKey2]);
+      })
+      .attr("cy", function (d) {
+        return y2(d[yKey2]);
+      })
+      .attr("r", 8)
+      .style("fill", function (d) {
+        return color(d.Species);
+      })
+      .style("opacity", 0.5);
+
+      {
+ 
+var groups = d3.group(data, d => d.Species)
+
+    //Add X axis
+    var x3 = d3
+      .scaleBand()
+      .domain(data.map(d => d.Species))
+      .range([0, width]);
+
+    var y3 = d3
+      .scaleLinear()
+      .domain([0, d3.max(groups, function(d) {return d[1].length})])
+      .range([height, 0]);
+    svg3
+      .append("g")
+      .call(d3.axisLeft(y3).tickFormat(function(d){
+             return d;
+         }).ticks(10))
+
+      .call((g) =>
+        g
+          .append("text")
+          .attr("x", - margin.left)
+          .attr("y", 10)
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "start")
+          );
+
+    svg3
+      .append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x3)).call((g) =>
+        g
+          .append("text")
+          .attr("x", width)
+          .attr("y", margin.bottom - 4)
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "end")
+      );
+
+      svg3.selectAll("bar")
+      .data(groups)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("transform", function(d) {return `translate(${x3(d[0]) + x3.bandwidth() / 6},0)`})
+    .attr("width", x3.bandwidth() - 40)
+    .attr("height", d => height - y3(d[1].length))
+    .style("fill", function (d) {
+      return color(d[0]);
+    })
+
+  
+    //TODO: Define a brush
+
+    //TODO: Add brush to the svg
+    
+  }
+
+    //TODO: Define a brush
+
+    //TODO: Add brush to the svg
+    
+  }
+
 
   //TODO: Barchart with counts of different species
 
