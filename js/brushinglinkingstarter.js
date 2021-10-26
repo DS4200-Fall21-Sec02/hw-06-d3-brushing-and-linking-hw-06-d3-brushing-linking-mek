@@ -103,9 +103,12 @@ d3.csv("data/iris.csv").then((data) => {
       .style("opacity", 0.5);
 
     //TODO: Define a brush
-
-    //TODO: Add brush to the svg
+    var brush1 = d3.brush() 
+    .extent( [ [0,0], [width,height] ] )
+    .on("start brush", updateChart1)
     
+    //TODO: Add brush to the svg
+    svg1.call(brush1)
   }
 
   //TODO: Scatterplot 2 (show Sepal width on x-axis and Petal width on y-axis)
@@ -171,6 +174,14 @@ d3.csv("data/iris.csv").then((data) => {
       .style("opacity", 0.5);
 
       {
+
+    //TODO: Define a brush
+    var brush2 = d3.brush() 
+    .extent( [ [0,0], [width,height] ] )
+    .on("start brush", updateChart2)
+    
+    //TODO: Add brush to the svg
+    svg2.call(brush2)
  
 var groups = d3.group(data, d => d.Species)
 
@@ -211,7 +222,8 @@ var groups = d3.group(data, d => d.Species)
           .attr("text-anchor", "end")
       );
 
-      svg3.selectAll("bar")
+      var myBars = svg3.append("g")
+      .selectAll("bar")
       .data(groups)
       .enter().append("rect")
       .attr("class", "bar")
@@ -221,11 +233,6 @@ var groups = d3.group(data, d => d.Species)
     .style("fill", function (d) {
       return color(d[0]);
     })
-
-  
-    //TODO: Define a brush
-
-    //TODO: Add brush to the svg
     
   }
 
@@ -249,12 +256,14 @@ var groups = d3.group(data, d => d.Species)
     //Is called when we brush on scatterplot #1
     function updateChart1(brushEvent) {
         extent = brushEvent.selection;
-    
-        //TODO: Check all the circles that are within the brush region in Scatterplot 1
- 
-    
-        //TODO: Select all the data points in Scatterplot 2 which have the same id as those selected in Scatterplot 1
+
+        // A function that return TRUE or FALSE according if a dot is in the selection or not
+          myCircle1.classed("selected", function(d){ return isBrushed(extent, x1(d.Sepal_Length), y1(d.Petal_Length) ) } )
       
+        
+        
+        //TODO: Select all the data points in Scatterplot 2 which have the same id as those selected in Scatterplot 1
+        myCircle2.classed("selected", function(d){ return isBrushed(extent, x1(d.Sepal_Length), y1(d.Petal_Length) ) } )
     }
 
     //Is called when we brush on scatterplot #2
@@ -263,11 +272,18 @@ var groups = d3.group(data, d => d.Species)
       var selectedSpecies = new Set();
 
       //TODO: Check all the circles that are within the brush region in Scatterplot 2
-
+      myCircle2.classed("selected", function(d){ 
+        if(isBrushed(extent, x2(d.Sepal_Width), y2(d.Petal_Width))) {
+          selectedSpecies.add(d.Species)
+          return true
+        } 
+      } )
+      
       //TODO: Select all the data points in Scatterplot 1 which have the same id as those selected in Scatterplot 2
-
+      myCircle1.classed("selected", function(d){ return isBrushed(extent, x2(d.Sepal_Width), y2(d.Petal_Width) ) } )
+      
       //TODO: Select bars in bar chart based on species selected in Scatterplot 2
-
+      myBars.classed("selected", function(d){ return selectedSpecies.has(d[0])})
     }
 
     //Finds dots within the brushed region
